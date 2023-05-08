@@ -1,10 +1,41 @@
 const database = require("./database");
 
 const getUsers = (req, res) => {
+  const initialSql = "select * from users";
+  const conditions = [];
+
+  if (req.query.language != null) {
+    conditions.push({
+      column: "language",
+      value: req.query.language,
+      operator: "=",
+    });
+  }
+  if (req.query.city != null) {
+    conditions.push({
+      column: "city",
+      value: req.query.city,
+      operator: "=",
+    }); }
+  else if (req.query.city != null) {
+    conditions.push({
+      column: "city",
+      value: req.query.city,
+      operator: "=",
+    });
+  } 
+
   database
-    .query("SELECT * FROM users")
-    .then(([users]) => {
-      res.status(200).json(users);
+    .query(
+      where.reduce(
+        (sql, { column, operator }, index) =>
+          `${sql} ${index === 0 ? "where" : "and"} ${column} ${operator} ?`,
+        initialSql
+      ),
+      where.map(({ value }) => value)
+    )
+    .then(([movies]) => {
+      res.json(movies);
     })
     .catch((err) => {
       console.error(err);
@@ -85,6 +116,7 @@ const deleteUser = (req, res) => {
       res.status(500).send("Error deleting the user");
     });
 };
+
 
 module.exports = {
   getUsers,
