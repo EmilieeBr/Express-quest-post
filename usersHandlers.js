@@ -27,12 +27,12 @@ const getUsers = (req, res) => {
 
   database
     .query(
-      where.reduce(
+      conditions.reduce(
         (sql, { column, operator }, index) =>
           `${sql} ${index === 0 ? "where" : "and"} ${column} ${operator} ?`,
         initialSql
       ),
-      where.map(({ value }) => value)
+      conditions.map(({ value }) => value)
     )
     .then(([movies]) => {
       res.json(movies);
